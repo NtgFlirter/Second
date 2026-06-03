@@ -12,20 +12,13 @@ import com.yashwant.ui.theme.appColors
 import com.yashwant.viewmodel.AppViewModel
 import com.yashwant.viewmodel.HomeViewModel
 
-// ─────────────────────────────────────────────────────────────
-//  HomeScreen
-//  • Observes isDarkTheme from AppViewModel → drives all colors
-//  • Data comes from HomeViewModel
-//  • LazyColumn with stable keys → NO SCROLL CRASH
-// ─────────────────────────────────────────────────────────────
-
 @Composable
 fun HomeScreen(
-    appViewModel: AppViewModel,                       // injected from Activity/NavGraph
+    appViewModel: AppViewModel,                      
     homeViewModel: HomeViewModel = viewModel()
 ) {
     val isDark by appViewModel.isDarkTheme.collectAsState()
-    val colors = appColors(isDark)                    // derives all colors from theme
+    val colors = appColors(isDark)                    
 
     val profile  by homeViewModel.profile.collectAsState()
     val stats    = homeViewModel.stats
