@@ -65,9 +65,7 @@ fun CalculatorScreen(
         listOf("0", ".", "=")
     )
 
-    // =========================
-    // AUTO SCROLL EXPRESSION (FIXED #8 PROPERLY)
-    // =========================
+
     LaunchedEffect(viewModel.expression.value) {
         scrollState.animateScrollTo(scrollState.maxValue)
     }
@@ -81,9 +79,6 @@ fun CalculatorScreen(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
 
-        // =========================
-        // TOP SECTION
-        // =========================
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -151,9 +146,7 @@ fun CalculatorScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // =========================
-            // EXPRESSION (SCROLL + AUTO FOLLOW)
-            // =========================
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -192,9 +185,7 @@ fun CalculatorScreen(
                 }
             }
 
-            // =========================
-            // RESULT
-            // =========================
+
             val resultFontSize = calculateResultFontSize(viewModel.result.value)
 
             Text(
@@ -209,9 +200,6 @@ fun CalculatorScreen(
             Spacer(modifier = Modifier.height(20.dp))
         }
 
-        // =========================
-        // KEYPAD
-        // =========================
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
