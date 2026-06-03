@@ -26,8 +26,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun toggleTheme() {
         val newValue = !isDarkTheme.value
-        // We update Firestore; the flow in 'init' will detect the change
-        // and update the UI automatically.
         firebaseRepo.saveTheme(newValue)
     }
 }
