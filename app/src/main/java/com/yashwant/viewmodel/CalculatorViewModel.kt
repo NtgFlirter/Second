@@ -13,23 +13,18 @@ class CalculatorViewModel(application: Application) : AndroidViewModel(applicati
 
     private val prefManager = PrefManager()
 
-    // =========================
-    // CALCULATOR STATE
-    // =========================
     var expression = mutableStateOf("")
         private set
 
     var result = mutableStateOf("0")
         private set
 
-    // 1. Start with an empty list (instant)
     var history = mutableStateOf<List<HistoryItem>>(emptyList())
         private set
 
     var isFinalResult = mutableStateOf(false)
         private set
 
-    // 2. Fetch the data from Firebase in the background
     init {
         viewModelScope.launch {
             val cloudHistory = prefManager.loadHistory()
@@ -37,34 +32,22 @@ class CalculatorViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    // =========================
-    // INPUT HANDLER
-    // =========================
     fun onButtonClick(value: String) {
 
         val operators = listOf("+", "-", "×", "÷")
 
         when (value) {
 
-            // =========================
-            // CLEAR
-            // =========================
             "C" -> {
                 expression.value = ""
                 result.value = "0"
                 isFinalResult.value = false
             }
 
-            // =========================
-            // BACKSPACE
-            // =========================
             "⌫" -> {
                 handleDelete()
             }
 
-            // =========================
-            // EQUALS
-            // =========================
             "=" -> {
 
                 if (expression.value.isBlank()) return
@@ -94,9 +77,6 @@ class CalculatorViewModel(application: Application) : AndroidViewModel(applicati
                 isFinalResult.value = true
             }
 
-            // =========================
-            // NORMAL INPUT
-            // =========================
             else -> {
 
                 val lastChar = expression.value.lastOrNull()?.toString()
@@ -108,9 +88,6 @@ class CalculatorViewModel(application: Application) : AndroidViewModel(applicati
 
                 val digitCount = currentNumber.length
 
-                // =========================
-                // AFTER RESULT RESET
-                // =========================
                 if (isFinalResult.value) {
 
                     if (value.first().isDigit() || value == ".") {
@@ -120,22 +97,12 @@ class CalculatorViewModel(application: Application) : AndroidViewModel(applicati
                     isFinalResult.value = false
                 }
 
-                // =========================
-                // DIGIT LIMIT
-                // =========================
                 if (value.first().isDigit() && digitCount >= 20) return
 
-                // =========================
-                // DECIMAL RULE
-                // =========================
                 if (value == "." && currentNumber.contains(".")) return
 
-                // =========================
-                // 🔥 NEW: LEADING ZERO FIX
-                // =========================
                 if (value.first().isDigit()) {
 
-                    // current number is just "0"
                     if (currentNumber == "0") {
 
                         // replace 0 with new digit (not append)
@@ -149,9 +116,7 @@ class CalculatorViewModel(application: Application) : AndroidViewModel(applicati
                     }
                 }
 
-                // =========================
-                // OPERATOR RULE
-                // =========================
+
                 if (value in operators) {
 
                     if (expression.value.isEmpty()) return
@@ -162,9 +127,7 @@ class CalculatorViewModel(application: Application) : AndroidViewModel(applicati
                     }
                 }
 
-                // =========================
-                // % RULE (your existing logic)
-                // =========================
+    
                 if (value == "%") {
 
                     if (expression.value.isEmpty()) return
@@ -188,9 +151,7 @@ class CalculatorViewModel(application: Application) : AndroidViewModel(applicati
         isFinalResult.value = false
     }
 
-    // =========================
-    // DELETE LOGIC
-    // =========================
+
     private fun handleDelete() {
 
         if (expression.value.isNotEmpty()) {
@@ -207,9 +168,7 @@ class CalculatorViewModel(application: Application) : AndroidViewModel(applicati
         prefManager.saveHistory(history.value)
     }
 
-    // =========================
-    // LIVE RESULT UPDATE
-    // =========================
+
 
     private fun updateLiveResult() {
 
