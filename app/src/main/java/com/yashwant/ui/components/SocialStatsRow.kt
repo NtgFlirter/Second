@@ -15,12 +15,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yashwant.ui.theme.AppColors
 
-// Each stat card has a unique accent tint for visual variety
+
 private val statTints = listOf(
-    Color(0xFF3B82F6), // blue  - Bot Users
-    Color(0xFF8B5CF6), // purple - Projects
-    Color(0xFF10B981), // green  - Repos
-    Color(0xFFF59E0B)  // amber  - Graduate
+    Color(0xFF3B82F6), 
+    Color(0xFF8B5CF6), 
+    Color(0xFF10B981), 
+    Color(0xFFF59E0B) 
 )
 
 @Composable
@@ -28,7 +28,6 @@ fun SocialStatsRow(stats: List<Pair<String, String>>, colors: AppColors) {
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
 
-        // Row 1
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -37,7 +36,6 @@ fun SocialStatsRow(stats: List<Pair<String, String>>, colors: AppColors) {
             if (stats.size > 1) StatCard(stats[1].first, stats[1].second, statTints[1], colors, Modifier.weight(1f))
         }
 
-        // Row 2
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
