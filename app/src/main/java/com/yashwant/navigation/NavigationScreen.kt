@@ -17,14 +17,11 @@ import com.yashwant.viewmodel.AppViewModel
 
 sealed class Screen(val route: String) {
 
-    object Home : Screen("home")
-
-    object Profile : Screen("profile")
-
-    object Calculator : Screen("calculator")
-
+    object Splash      : Screen("splash")        // ← NEW
+    object Home        : Screen("home")
+    object Profile     : Screen("profile")
+    object Calculator  : Screen("calculator")
     object EditProfile : Screen("edit_profile")
-
     object HandCricket : Screen("hand_cricket")
 }
 
@@ -43,9 +40,13 @@ fun NavigationScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val showBottomBar =
-        currentRoute != Screen.Calculator.route &&
-                currentRoute != Screen.HandCricket.route
+    // hide top/bottom bar on splash, calculator, and hand cricket
+    val isGameOrSplash =
+        currentRoute == Screen.Splash.route ||
+                currentRoute == Screen.Calculator.route ||
+                currentRoute == Screen.HandCricket.route
+
+    val showBottomBar = !isGameOrSplash
 
     ModalNavigationDrawer(
 
@@ -68,39 +69,40 @@ fun NavigationScreen(
             // =========================
             topBar = {
 
-                when (currentRoute) {
+                if (!isGameOrSplash) {
 
-                    Screen.Home.route -> {
-                        TopAppBar(
-                            title = { Text("Home") },
-                            navigationIcon = {
-                                IconButton(
-                                    onClick = {
-                                        scope.launch { drawerState.open() }
+                    when (currentRoute) {
+
+                        Screen.Home.route -> {
+                            TopAppBar(
+                                title = { Text("Home") },
+                                navigationIcon = {
+                                    IconButton(
+                                        onClick = {
+                                            scope.launch { drawerState.open() }
+                                        }
+                                    ) {
+                                        Icon(Icons.Default.Menu, null)
                                     }
-                                ) {
-                                    Icon(Icons.Default.Menu, null)
                                 }
-                            }
-                        )
-                    }
+                            )
+                        }
 
-                    Screen.Profile.route -> {
-                        TopAppBar(
-                            title = { Text("Profile") },
-                            navigationIcon = {
-                                IconButton(
-                                    onClick = {
-                                        scope.launch { drawerState.open() }
+                        Screen.Profile.route -> {
+                            TopAppBar(
+                                title = { Text("Profile") },
+                                navigationIcon = {
+                                    IconButton(
+                                        onClick = {
+                                            scope.launch { drawerState.open() }
+                                        }
+                                    ) {
+                                        Icon(Icons.Default.Menu, null)
                                     }
-                                ) {
-                                    Icon(Icons.Default.Menu, null)
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
-
-                    // Calculator has its OWN top bar → DO NOTHING HERE
                 }
             },
 
@@ -148,9 +150,7 @@ fun NavigationScreen(
                                     contentDescription = null
                                 )
                             },
-                            label = {
-                                Text("Cricket")
-                            }
+                            label = { Text("Cricket") }
                         )
 
                         NavigationBarItem(
@@ -171,10 +171,14 @@ fun NavigationScreen(
 
             NavHost(
                 navController = navController,
-                startDestination = Screen.Profile.route,
+                startDestination = Screen.Splash.route,   // ← CHANGED
                 modifier = Modifier.padding(padding)
             ) {
 
+                // ── SPLASH ──
+                composable(Screen.Splash.route) {
+                    SplashScreen(navController = navController)
+                }
 
                 composable(Screen.Home.route) {
                     HomeScreen(appViewModel = appViewModel)
@@ -205,7 +209,6 @@ fun NavigationScreen(
                 }
 
                 composable(Screen.EditProfile.route) {
-
                     EditProfileScreen(
                         navController = navController,
                         appViewModel = appViewModel

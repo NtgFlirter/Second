@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Main app theme -->
     <style name="Theme.Second" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Splash screen theme -->
+    <style name="Theme.Second.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#0B1220</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.Second</item>
+    </style>
+
 </resources>

@@ -100,7 +100,7 @@ fun PortfolioHeader(profile: PortfolioProfile, colors: AppColors) {
 
             Spacer(Modifier.height(8.dp))
 
-            // Role badge — glass pill
+            // Role badge - glass pill
             Box(
                 modifier = Modifier
                     .background(

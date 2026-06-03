@@ -5,9 +5,7 @@ plugins {
 
 android {
     namespace = "com.yashwant"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.yashwant"
@@ -28,23 +26,18 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-    implementation("androidx.compose.material:material-icons-extended")
-    implementation("net.objecthunter:exp4j:0.4.8")
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.browser:browser:1.8.0")
-    implementation("androidx.compose.foundation:foundation:1.6.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -54,8 +47,16 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.runtime)
-    implementation(libs.androidx.benchmark.traceprocessor)
-    implementation(libs.androidx.compose.remote.creation.core)
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.compose.foundation:foundation:1.6.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.browser:browser:1.8.0")
+    implementation("net.objecthunter:exp4j:0.4.8")
+    implementation("com.google.code.gson:gson:2.10.1")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

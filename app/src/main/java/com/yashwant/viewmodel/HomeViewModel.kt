@@ -32,7 +32,7 @@ class HomeViewModel : ViewModel() {
         ),
         Project(
             name = "GreenLeaf AI",
-            description = "Final year project — AI plant health diagnosis using ML.",
+            description = "Final year project - AI plant health diagnosis using ML.",
             tech = "Python · Streamlit · Scikit-learn · FastAPI",
             gradientStart = 0xFF1A5C2E,
             gradientEnd = 0xFF0A2614
@@ -46,7 +46,7 @@ class HomeViewModel : ViewModel() {
         ),
         Project(
             name = "Geldium AI Analytics",
-            description = "AI-powered delinquency prediction — Tata iQ via Forage.",
+            description = "AI-powered delinquency prediction - Tata iQ via Forage.",
             tech = "Python · GenAI · EDA · ML",
             gradientStart = 0xFF5B3A00,
             gradientEnd = 0xFF251800

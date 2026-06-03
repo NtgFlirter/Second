@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yashwant.ui.theme.AppColors
 
-// Skill chip accent colors — cycles through for visual richness
+// Skill chip accent colors , cycles through for visual richness
 private val chipColors = listOf(
     Color(0xFF3B82F6), Color(0xFF8B5CF6), Color(0xFF10B981),
     Color(0xFFF59E0B), Color(0xFFEF4444), Color(0xFF06B6D4)
@@ -27,7 +27,7 @@ fun SkillsSection(skills: List<String>, colors: AppColors) {
         SectionTitle("Skills", colors)
         Spacer(Modifier.height(12.dp))
 
-        // Manual row wrapping — no FlowRow dependency needed
+        // Manual row wrapping - no FlowRow dependency needed
         val rows = skills.chunked(3)
         rows.forEachIndexed { rowIndex, rowSkills ->
             Row(

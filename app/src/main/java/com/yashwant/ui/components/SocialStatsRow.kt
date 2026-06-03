@@ -17,10 +17,10 @@ import com.yashwant.ui.theme.AppColors
 
 // Each stat card has a unique accent tint for visual variety
 private val statTints = listOf(
-    Color(0xFF3B82F6), // blue  — Bot Users
-    Color(0xFF8B5CF6), // purple — Projects
-    Color(0xFF10B981), // green  — Repos
-    Color(0xFFF59E0B)  // amber  — Graduate
+    Color(0xFF3B82F6), // blue  - Bot Users
+    Color(0xFF8B5CF6), // purple - Projects
+    Color(0xFF10B981), // green  - Repos
+    Color(0xFFF59E0B)  // amber  - Graduate
 )
 
 @Composable
