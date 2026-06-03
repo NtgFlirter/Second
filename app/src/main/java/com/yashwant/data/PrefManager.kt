@@ -7,17 +7,14 @@ import com.yashwant.model.HistoryItem
 import com.yashwant.model.ProfileState
 import kotlinx.coroutines.tasks.await
 
-class PrefManager { // Class name is the same!
+class PrefManager { 
 
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
-    // Helper to get the logged-in User's ID
     private val uid: String? get() = auth.currentUser?.uid
 
-    // =========================================================
-    // THEME
-    // =========================================================
+
 
     fun saveTheme(isDark: Boolean) {
         uid?.let { id ->
@@ -26,7 +23,6 @@ class PrefManager { // Class name is the same!
         }
     }
 
-    // Changing this to 'suspend' because internet is not instant
     suspend fun loadTheme(): Boolean {
         val id = uid ?: return true
         return try {
@@ -37,9 +33,6 @@ class PrefManager { // Class name is the same!
         }
     }
 
-    // =========================================================
-    // HISTORY (CALCULATOR)
-    // =========================================================
 
     fun saveHistory(history: List<HistoryItem>) {
         uid?.let { id ->
@@ -66,9 +59,6 @@ class PrefManager { // Class name is the same!
         }
     }
 
-    // =========================================================
-    // PROFILE
-    // =========================================================
 
     fun saveProfile(state: ProfileState) {
         uid?.let { id ->
@@ -95,9 +85,7 @@ class PrefManager { // Class name is the same!
         }
     }
 
-    // =========================================================
-    // CLEANUP
-    // =========================================================
+
 
     fun clearProfile() {
         uid?.let { id ->
