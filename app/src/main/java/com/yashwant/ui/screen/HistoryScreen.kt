@@ -33,7 +33,7 @@ import com.yashwant.viewmodel.CalculatorViewModel
 fun HistoryScreen(
     navController: NavController,
     viewModel: CalculatorViewModel,
-    appViewModel: AppViewModel    // ✅ Add AppViewModel here
+    appViewModel: AppViewModel    
 ) {
 
     // Observe global dark theme state
