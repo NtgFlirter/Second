@@ -53,7 +53,7 @@ fun CustomDrawer(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    // ✅ GLOBAL THEME
+    //  GLOBAL THEME
     val darkTheme by appViewModel.isDarkTheme.collectAsState()
 
     val bgColor = if (darkTheme) Color(0xFF121212) else Color.White
@@ -69,7 +69,7 @@ fun CustomDrawer(
         drawerContainerColor = bgColor
     ) {
 
-        // ================= THEME BUTTON =================
+        //  THEME BUTTON 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -93,7 +93,7 @@ fun CustomDrawer(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // ================= PROFILE =================
+        //  PROFILE 
         Column(modifier = Modifier.padding(horizontal = 20.dp)) {
 
             Image(
@@ -125,7 +125,7 @@ fun CustomDrawer(
         HorizontalDivider(color = subTextColor.copy(alpha = 0.3f))
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ================= MENU =================
+        //  MENU 
         val menuItems = listOf(
             "Home" to R.drawable.home,
             "Profile" to R.drawable.profile,
