@@ -35,9 +35,7 @@ import androidx.navigation.NavController
 import com.yashwant.R
 import com.yashwant.viewmodel.HandCricketViewModel
 
-// ─────────────────────────────────────────────
 // MAIN SCREEN
-// ─────────────────────────────────────────────
 @Composable
 fun HandCricketScreen(
     navController: NavController,
@@ -48,7 +46,7 @@ fun HandCricketScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // ───────── BACKGROUND ─────────
+        //  BACKGROUND 
         Image(
             painter = painterResource(R.drawable.stadium_bg),
             contentDescription = null,
@@ -62,7 +60,7 @@ fun HandCricketScreen(
                 .background(Color.Black.copy(alpha = 0.25f))
         )
 
-        // ───────── MAIN UI ─────────
+        //  MAIN UI 
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -102,7 +100,7 @@ fun HandCricketScreen(
             NumberPad { vm.play(it) }
         }
 
-        // ───────── CLOSE BUTTON ─────────
+        //  CLOSE BUTTON 
         IconButton(
             onClick = { navController.popBackStack() },
             modifier = Modifier
@@ -114,7 +112,7 @@ fun HandCricketScreen(
             Text("✖", color = Color.White)
         }
 
-        // ───────── POPUP (BLOCKS GAME) ─────────
+        //  POPUP (BLOCKS GAME) 
         if (state.showEvent) {
 
             Box(
