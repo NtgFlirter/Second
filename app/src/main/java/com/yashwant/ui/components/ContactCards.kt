@@ -29,7 +29,7 @@ fun ContactCards(profile: PortfolioProfile, colors: AppColors) {
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
 
-        // EMAIL CARD - glass with blue tint
+        // EMAIL CARD
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -64,7 +64,7 @@ fun ContactCards(profile: PortfolioProfile, colors: AppColors) {
             }
         }
 
-        // LINKEDIN CARD - glass with LinkedIn blue tint
+        // LINKEDIN CARD
         Box(
             modifier = Modifier
                 .weight(1f)
