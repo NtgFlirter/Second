@@ -35,10 +35,6 @@ object CalculatorEngine {
         return e
     }
 
-    // =========================
-    // PUBLIC FUNCTION
-    // =========================
-
 
     fun calculate(input: String): String {
         return try {
@@ -60,25 +56,17 @@ object CalculatorEngine {
         }
     }
 
-    // =========================
-    // PREPROCESS
-    // =========================
     private fun preprocess(input: String): String {
         return input
             .replace("×", "*")
             .replace("÷", "/")
     }
 
-    // =========================
-    // PERCENT HANDLING (REAL FIX)
-    // =========================
     private fun handlePercent(input: String): String {
 
         var expr = input
 
-        // =========================
-        // 1. CONTEXT: A + B%
-        // =========================
+        //  CONTEXT: A + B%
         val contextRegex = Regex("(\\d+(?:\\.\\d+)?)([+\\-×÷])(\\d+(?:\\.\\d+)?)%")
 
         while (true) {
@@ -102,9 +90,7 @@ object CalculatorEngine {
             expr = expr.replaceRange(match.range, replaced.toString())
         }
 
-        // =========================
-        // 2. STANDALONE: 10% → 0.1
-        // =========================
+        // STANDALONE: 10% → 0.1
         val standaloneRegex = Regex("(\\d+(?:\\.\\d+)?)%")
 
         while (true) {
@@ -119,9 +105,7 @@ object CalculatorEngine {
         return expr
     }
 
-    // =========================
-    // FIX: digit % digit → digit%*digit
-    // =========================
+
     private fun fixImplicitMultiplication(input: String): String {
 
         val sb = StringBuilder()
@@ -173,9 +157,7 @@ object CalculatorEngine {
         return sb.toString()
     }
 
-    // =========================
-    // EVALUATOR (BODMAS)
-    // =========================
+
     private fun evaluate(expr: String): Double {
 
         return object {
@@ -269,9 +251,6 @@ object CalculatorEngine {
         }.parse()
     }
 
-    // =========================
-    // SMART FORMATTING
-    // =========================
     private fun format(value: Double): String {
 
         if (value.isNaN() || value.isInfinite())
