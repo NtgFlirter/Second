@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "263918299076",
+    "project_id": "andrioid-b5a1f",
+    "storage_bucket": "andrioid-b5a1f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:263918299076:android:86993457782f0b8c70e691",
+        "android_client_info": {
+          "package_name": "com.yashwant"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaBK76Dw82PbFaubXiJs7nFNBK6xF8IJU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

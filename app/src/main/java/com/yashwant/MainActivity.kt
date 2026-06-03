@@ -11,26 +11,22 @@ import com.yashwant.ui.theme.SecondTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.yashwant.viewmodel.AppViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        installSplashScreen()   // ← ADD THIS (must be before super.onCreate)
-
+        installSplashScreen()
         super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
+
+        FirebaseAuth.getInstance().signInAnonymously()
 
         val appViewModel: AppViewModel by viewModels()
 
         setContent {
             val darkTheme by appViewModel.isDarkTheme.collectAsState()
-
             SecondTheme(darkTheme = darkTheme) {
-                NavigationScreen(
-                    appViewModel = appViewModel
-                )
+                NavigationScreen(appViewModel = appViewModel)
             }
         }
     }

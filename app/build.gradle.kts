@@ -1,6 +1,7 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.compose)
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("com.android.application")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -38,6 +39,7 @@ android {
 }
 
 dependencies {
+    // 1. AndroidX & Compose (Using your catalog)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -48,15 +50,24 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.runtime)
 
+    // 2. FIREBASE - The "Bill of Materials" handles all versions for you automatically
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-analytics")
+
+    // 3. Navigation & UI
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.compose.foundation:foundation:1.6.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.browser:browser:1.8.0")
+
+    // 4. Utilities
     implementation("net.objecthunter:exp4j:0.4.8")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("androidx.browser:browser:1.8.0")
 
+    // 5. Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -1,28 +1,40 @@
 package com.yashwant.data
 
-import android.content.Context
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.yashwant.model.HistoryItem
 import com.yashwant.model.ProfileState
+import kotlinx.coroutines.tasks.await
 
-class PrefManager(context: Context) {
+class PrefManager { // Class name is the same!
 
-    private val prefs =
-        context.getSharedPreferences("app_pref", Context.MODE_PRIVATE)
+    private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
-    private val gson = Gson()
+    // Helper to get the logged-in User's ID
+    private val uid: String? get() = auth.currentUser?.uid
 
     // =========================================================
     // THEME
     // =========================================================
 
     fun saveTheme(isDark: Boolean) {
-        prefs.edit().putBoolean("theme", isDark).apply()
+        uid?.let { id ->
+            db.collection("users").document(id)
+                .set(mapOf("theme" to isDark), SetOptions.merge())
+        }
     }
 
-    fun loadTheme(): Boolean {
-        return prefs.getBoolean("theme", true)
+    // Changing this to 'suspend' because internet is not instant
+    suspend fun loadTheme(): Boolean {
+        val id = uid ?: return true
+        return try {
+            val snapshot = db.collection("users").document(id).get().await()
+            snapshot.getBoolean("theme") ?: true
+        } catch (e: Exception) {
+            true
+        }
     }
 
     // =========================================================
@@ -30,19 +42,28 @@ class PrefManager(context: Context) {
     // =========================================================
 
     fun saveHistory(history: List<HistoryItem>) {
-        val json = gson.toJson(history)
-        prefs.edit()
-            .putString("history", json)
-            .apply()
+        uid?.let { id ->
+            // Firestore saves Lists directly as Arrays
+            db.collection("users").document(id)
+                .set(mapOf("history" to history), SetOptions.merge())
+        }
     }
 
-    fun loadHistory(): List<HistoryItem> {
-        val json = prefs.getString("history", null)
-            ?: return emptyList()
+    suspend fun loadHistory(): List<HistoryItem> {
+        val id = uid ?: return emptyList()
+        return try {
+            val snapshot = db.collection("users").document(id).get().await()
+            val list = snapshot.get("history") as? List<Map<String, Any>> ?: return emptyList()
 
-        val type = object : TypeToken<List<HistoryItem>>() {}.type
-
-        return gson.fromJson(json, type)
+            list.map {
+                HistoryItem(
+                    expression = it["expression"] as? String ?: "",
+                    result = it["result"] as? String ?: ""
+                )
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     // =========================================================
@@ -50,40 +71,44 @@ class PrefManager(context: Context) {
     // =========================================================
 
     fun saveProfile(state: ProfileState) {
-        prefs.edit()
-            .putString("name", state.name)
-            .putString("email", state.email)
-            .putString("phone", state.phone)
-            .putString("role", state.role)
-            .putString("location", state.location)
-            .apply()
+        uid?.let { id ->
+            db.collection("users").document(id)
+                .set(mapOf("profile" to state), SetOptions.merge())
+        }
     }
 
-    fun loadProfile(): ProfileState {
-        return ProfileState(
-            name = prefs.getString("name", "") ?: "",
-            email = prefs.getString("email", "") ?: "",
-            phone = prefs.getString("phone", "") ?: "",
-            role = prefs.getString("role", "") ?: "",
-            location = prefs.getString("location", "") ?: ""
-        )
+    suspend fun loadProfile(): ProfileState {
+        val id = uid ?: return ProfileState()
+        return try {
+            val snapshot = db.collection("users").document(id).get().await()
+            val data = snapshot.get("profile") as? Map<String, Any> ?: return ProfileState()
+
+            ProfileState(
+                name = data["name"] as? String ?: "",
+                email = data["email"] as? String ?: "",
+                phone = data["phone"] as? String ?: "",
+                role = data["role"] as? String ?: "",
+                location = data["location"] as? String ?: ""
+            )
+        } catch (e: Exception) {
+            ProfileState()
+        }
     }
+
+    // =========================================================
+    // CLEANUP
+    // =========================================================
 
     fun clearProfile() {
-        prefs.edit()
-            .remove("name")
-            .remove("email")
-            .remove("phone")
-            .remove("role")
-            .remove("location")
-            .apply()
+        uid?.let { id ->
+            db.collection("users").document(id)
+                .update("profile", null)
+        }
     }
 
-    // =========================================================
-    // OPTIONAL: FULL RESET (if needed later)
-    // =========================================================
-
     fun clearAll() {
-        prefs.edit().clear().apply()
+        uid?.let { id ->
+            db.collection("users").document(id).delete()
+        }
     }
 }

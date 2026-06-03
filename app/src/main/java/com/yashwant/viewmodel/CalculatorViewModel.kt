@@ -3,16 +3,15 @@ package com.yashwant.viewmodel
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.yashwant.calculator.CalculatorEngine
 import com.yashwant.data.PrefManager
 import com.yashwant.model.HistoryItem
+import kotlinx.coroutines.launch
 
-class CalculatorViewModel(
-    application: Application
-) : AndroidViewModel(application) {
+class CalculatorViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val prefManager = PrefManager(application)
-
+    private val prefManager = PrefManager()
 
     // =========================
     // CALCULATOR STATE
@@ -23,12 +22,20 @@ class CalculatorViewModel(
     var result = mutableStateOf("0")
         private set
 
-    var history =
-        mutableStateOf(prefManager.loadHistory())
+    // 1. Start with an empty list (instant)
+    var history = mutableStateOf<List<HistoryItem>>(emptyList())
         private set
 
     var isFinalResult = mutableStateOf(false)
         private set
+
+    // 2. Fetch the data from Firebase in the background
+    init {
+        viewModelScope.launch {
+            val cloudHistory = prefManager.loadHistory()
+            history.value = cloudHistory
+        }
+    }
 
     // =========================
     // INPUT HANDLER
