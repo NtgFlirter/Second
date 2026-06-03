@@ -4,7 +4,7 @@ data class PortfolioProfile(
     val name: String = "Yashwant Vashisht",
     val username: String = "@Flirter_kun",
     val role: String = "Android Developer & Python Web Developer",
-    val bio: String = "Motivated CS student with hands-on experience in bot development, web development, and real-time applications.",
+    val bio: String = "Motivated CS student.",
     val email: String = "yesvashisht2005@gmail.com",
     val phone: String = "+91 98294 62014",
     val github: String = "github.com/Yashwant2005",
