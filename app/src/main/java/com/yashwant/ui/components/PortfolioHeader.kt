@@ -38,7 +38,7 @@ fun PortfolioHeader(profile: PortfolioProfile, colors: AppColors) {
                     colors = listOf(Color(0xE4B6A0E3), Color(0xFF8463C9))
                 )
             )
-            // Glass overlay on top of gradient
+            // Glass on top of gradient
             .background(colors.glassBg)
             .padding(24.dp)
     ) {
@@ -46,9 +46,7 @@ fun PortfolioHeader(profile: PortfolioProfile, colors: AppColors) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Avatar with glow ring
             Box(contentAlignment = Alignment.Center) {
-                // Outer glow ring
                 Box(
                     modifier = Modifier
                         .size(100.dp)
@@ -100,7 +98,7 @@ fun PortfolioHeader(profile: PortfolioProfile, colors: AppColors) {
 
             Spacer(Modifier.height(8.dp))
 
-            // Role badge - glass pill
+            // Role badge
             Box(
                 modifier = Modifier
                     .background(
