@@ -30,7 +30,6 @@ class FirebaseRepository {
             "bio" to bio,
             "github" to github
         )
-        // .set() se pura document overwrite hota hai, .update() se sirf specific fields
         db.collection("users").document(id).update(userProfile)
     }
 
@@ -46,11 +45,9 @@ class FirebaseRepository {
     }
 
     // Listen to theme changes in real-time
-    // Replace this function in FirebaseRepository.kt
     fun getThemeFlow(): Flow<Boolean> = callbackFlow {
         val id = userId
 
-        // Fix: If there is no user, send default and close the channel properly
         if (id == null) {
             trySend(false)
             close()
@@ -63,7 +60,6 @@ class FirebaseRepository {
                 trySend(isDark)
             }
 
-        // This line MUST be reached for the app not to crash
         awaitClose {
             listener.remove()
         }
