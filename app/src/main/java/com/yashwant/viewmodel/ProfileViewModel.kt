@@ -10,14 +10,11 @@ import kotlinx.coroutines.launch
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
 
-    // 1. Context ki ab zaroorat nahi hai kyunki Firebase Manager use kar rahe hain
     private val prefManager = PrefManager()
 
-    // 2. Shuruat mein default (khali) ProfileState rakhein
     var state = mutableStateOf(ProfileState())
         private set
 
-    // 3. Init block mein cloud se data load karein
     init {
         viewModelScope.launch {
             val cloudProfile = prefManager.loadProfile()
@@ -30,7 +27,6 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun saveProfile() {
-        // Data Firebase mein save hoga
         prefManager.saveProfile(state.value)
     }
 
