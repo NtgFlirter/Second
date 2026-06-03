@@ -2,7 +2,6 @@ package com.yashwant.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ─── Dark Theme Colors ───────────────────────────────────────
 object PortfolioDarkColors {
     val background       = Color(0xFF080E1E)
     val surface          = Color(0xFF0D1428)
@@ -19,7 +18,6 @@ object PortfolioDarkColors {
     val divider          = Color(0x1AFFFFFF)
 }
 
-// ─── Light Theme Colors ──────────────────────────────────────
 object PortfolioLightColors {
     val background       = Color(0xFFF0F4FF)
     val surface          = Color(0xFFFFFFFF)
@@ -36,7 +34,6 @@ object PortfolioLightColors {
     val divider          = Color(0x33000000)
 }
 
-// ─── Theme accessor ──────────────────────────────────────────
 data class AppColors(
     val background: Color,
     val surface: Color,
