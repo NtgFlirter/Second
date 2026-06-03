@@ -54,7 +54,6 @@ fun ProfileMenuItem(
             )
         }
 
-        // ✅ Divider only if NOT last item
         if (!isLast) {
             HorizontalDivider(
                 modifier = Modifier.padding(start = 56.dp),
