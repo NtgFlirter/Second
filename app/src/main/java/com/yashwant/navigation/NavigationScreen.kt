@@ -17,7 +17,7 @@ import com.yashwant.viewmodel.AppViewModel
 
 sealed class Screen(val route: String) {
 
-    object Splash      : Screen("splash")        // ← NEW
+    object Splash      : Screen("splash")      
     object Home        : Screen("home")
     object Profile     : Screen("profile")
     object Calculator  : Screen("calculator")
@@ -40,7 +40,7 @@ fun NavigationScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // hide top/bottom bar on splash, calculator, and hand cricket
+
     val isGameOrSplash =
         currentRoute == Screen.Splash.route ||
                 currentRoute == Screen.Calculator.route ||
@@ -64,9 +64,7 @@ fun NavigationScreen(
 
         Scaffold(
 
-            // =========================
-            // TOP APP BAR (per screen)
-            // =========================
+       
             topBar = {
 
                 if (!isGameOrSplash) {
@@ -106,9 +104,6 @@ fun NavigationScreen(
                 }
             },
 
-            // =========================
-            // BOTTOM NAVIGATION
-            // =========================
             bottomBar = {
 
                 if (showBottomBar) {
