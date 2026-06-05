@@ -13,6 +13,7 @@ class HandCricketViewModel : ViewModel() {
 
         val current = _state.value
 
+        //  BLOCK INPUT IF POPUP OR GAME OVER
         if (current.showEvent || current.gameOver) return
 
         val ai = (1..6).random()
@@ -28,7 +29,7 @@ class HandCricketViewModel : ViewModel() {
         var eventMsg = ""
         var showEvent = false
 
-        // PLAYER BATTING 
+        // ───── PLAYER BATTING ─────
         if (isBatting) {
 
             if (number == ai) {
@@ -60,7 +61,7 @@ class HandCricketViewModel : ViewModel() {
             }
         }
 
-        //  AI BATTING 
+        // ───── AI BATTING ─────
         else {
 
             if (number == ai) {

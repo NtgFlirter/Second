@@ -66,6 +66,7 @@ dependencies {
     implementation("net.objecthunter:exp4j:0.4.8")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("androidx.browser:browser:1.8.0")
+    implementation(libs.androidx.compose.foundation)
 
     // 5. Testing
     testImplementation(libs.junit)
@@ -75,4 +76,14 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // 6. Datastore
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // 7. Retrofit: API se data khichne ke liye
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+// 8. Coil: Internet se image dikhane ke liye (AsyncImage)
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }

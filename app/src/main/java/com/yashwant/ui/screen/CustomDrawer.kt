@@ -42,6 +42,7 @@ import androidx.navigation.NavHostController
 import com.yashwant.R
 import com.yashwant.viewmodel.AppViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.material.icons.filled.SportsCricket
 
 @Composable
 fun CustomDrawer(
@@ -97,7 +98,7 @@ fun CustomDrawer(
         Column(modifier = Modifier.padding(horizontal = 20.dp)) {
 
             Image(
-                painter = painterResource(id = R.drawable.img),
+                painter = painterResource(id = R.drawable.sthat),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -129,18 +130,20 @@ fun CustomDrawer(
         val menuItems = listOf(
             "Home" to R.drawable.home,
             "Profile" to R.drawable.profile,
-            "Calculator" to R.drawable.calculate
+            "Calculator" to R.drawable.calculate,
+            "Cricket" to Icons.Default.SportsCricket
         )
 
         val routeMap = mapOf(
             "Home" to "home",
             "Profile" to "profile",
-            "Calculator" to "calculator"
+            "Calculator" to "calculator",
+            "Cricket" to "hand_cricket"
         )
 
         menuItems.forEach { item ->
 
-            val isSelected = currentRoute == routeMap[item.first]
+            val isSelected = currentRoute == routeMap[item.first as String]
 
             Row(
                 modifier = Modifier
@@ -149,34 +152,41 @@ fun CustomDrawer(
                     .clip(RoundedCornerShape(14.dp))
                     .background(if (isSelected) itemBg else Color.Transparent)
                     .clickable {
-
                         scope.launch { drawerState.close() }
 
+                        // 3. Navigation logic mein "Cricket" handle kiya
                         when (item.first) {
-
                             "Home" -> navController.navigate("home")
                             "Profile" -> navController.navigate("profile")
                             "Calculator" -> navController.navigate("calculator")
-
+                            "Cricket" -> navController.navigate("hand_cricket")
                         }
                     }
                     .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                Image(
-                    painter = painterResource(id = item.second),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp),
-                    colorFilter = ColorFilter.tint(
-                        if (isSelected) textColor else subTextColor
+                // Icon display logic (Check if it's Drawable or ImageVector)
+                if (item.second is Int) {
+                    Image(
+                        painter = painterResource(id = item.second as Int),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        colorFilter = ColorFilter.tint(if (isSelected) textColor else subTextColor)
                     )
-                )
+                } else {
+                    Icon(
+                        imageVector = item.second as androidx.compose.ui.graphics.vector.ImageVector,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = if (isSelected) textColor else subTextColor
+                    )
+                }
 
                 Spacer(modifier = Modifier.width(16.dp))
 
                 Text(
-                    text = item.first,
+                    text = item.first as String,
                     fontSize = 17.sp,
                     color = if (isSelected) textColor else subTextColor,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal

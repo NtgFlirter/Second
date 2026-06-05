@@ -9,7 +9,7 @@ object CalculatorEngine {
 
         var e = expr
 
-        // 1. Replace multiple operators
+        // 1. Replacing multiple operators
         e = e.replace("++", "+")
             .replace("--", "+")
             .replace("+-", "-")
@@ -55,18 +55,16 @@ object CalculatorEngine {
             "Error"
         }
     }
-
     private fun preprocess(input: String): String {
         return input
             .replace("×", "*")
             .replace("÷", "/")
     }
-
     private fun handlePercent(input: String): String {
 
         var expr = input
 
-        //  CONTEXT: A + B%
+        // 1. CONTEXT: A + B%
         val contextRegex = Regex("(\\d+(?:\\.\\d+)?)([+\\-×÷])(\\d+(?:\\.\\d+)?)%")
 
         while (true) {
@@ -90,7 +88,7 @@ object CalculatorEngine {
             expr = expr.replaceRange(match.range, replaced.toString())
         }
 
-        // STANDALONE: 10% → 0.1
+        // 2. STANDALONE: 10% → 0.1
         val standaloneRegex = Regex("(\\d+(?:\\.\\d+)?)%")
 
         while (true) {
@@ -105,7 +103,7 @@ object CalculatorEngine {
         return expr
     }
 
-
+    // FIX: digit % digit → digit%*digit
     private fun fixImplicitMultiplication(input: String): String {
 
         val sb = StringBuilder()
@@ -157,7 +155,7 @@ object CalculatorEngine {
         return sb.toString()
     }
 
-
+    // EVALUATOR (BODMAS)
     private fun evaluate(expr: String): Double {
 
         return object {
@@ -251,6 +249,7 @@ object CalculatorEngine {
         }.parse()
     }
 
+    // SMART FORMATTING
     private fun format(value: Double): String {
 
         if (value.isNaN() || value.isInfinite())

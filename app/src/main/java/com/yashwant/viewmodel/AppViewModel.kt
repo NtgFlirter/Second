@@ -3,29 +3,31 @@ package com.yashwant.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.yashwant.data.FirebaseRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.yashwant.data.SettingsManager
+import com.yashwant.data.UserRepository
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val firebaseRepo = FirebaseRepository()
+    // Repository connection
 
-    private val _isDarkTheme = MutableStateFlow(false)
-    val isDarkTheme = _isDarkTheme.asStateFlow()
+    private val repository = UserRepository(SettingsManager(application))
 
-    init {
-        // Collect the theme from Firebase Flow
-        viewModelScope.launch {
-            firebaseRepo.getThemeFlow().collect { updatedTheme ->
-                _isDarkTheme.value = updatedTheme
-            }
-        }
-    }
+    // Theme ko "Stream" ki tarah observe.
+    // stateIn use karne se ye Compose ke liye 'State' ban jata hai
+    val isDarkTheme: StateFlow<Boolean> = repository.themeStream.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false // Default Light
+    )
 
     fun toggleTheme() {
         val newValue = !isDarkTheme.value
-        firebaseRepo.saveTheme(newValue)
+        viewModelScope.launch {
+            repository.toggleTheme(newValue)
+        }
     }
 }

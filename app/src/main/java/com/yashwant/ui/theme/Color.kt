@@ -14,3 +14,5 @@ val LightButton = Color(0xFFFFFFFF)
 
 val DarkText = Color.White
 val LightText = Color.Black
+
+val FoodGreen = Color(0xFF65B741)

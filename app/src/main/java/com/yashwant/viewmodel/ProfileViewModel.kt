@@ -4,21 +4,27 @@ import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.yashwant.data.PrefManager
+import com.yashwant.data.SettingsManager
+import com.yashwant.data.UserRepository
 import com.yashwant.model.ProfileState
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val prefManager = PrefManager()
+    private val repository = UserRepository(SettingsManager(application))
 
     var state = mutableStateOf(ProfileState())
         private set
 
     init {
+        observeProfile()
+    }
+
+    private fun observeProfile() {
         viewModelScope.launch {
-            val cloudProfile = prefManager.loadProfile()
-            state.value = cloudProfile
+            repository.getProfileStream().collect { updatedProfile ->
+                state.value = updatedProfile
+            }
         }
     }
 
@@ -27,11 +33,17 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun saveProfile() {
-        prefManager.saveProfile(state.value)
+        viewModelScope.launch {
+            repository.saveProfile(state.value)
+        }
     }
 
+    //Clears the profile data
     fun clearProfile() {
-        prefManager.clearProfile()
-        state.value = ProfileState()
+        viewModelScope.launch {
+            val emptyProfile = ProfileState()
+            repository.saveProfile(emptyProfile)
+            state.value = emptyProfile
+        }
     }
 }

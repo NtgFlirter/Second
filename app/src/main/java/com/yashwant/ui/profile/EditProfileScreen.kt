@@ -2,8 +2,10 @@ package com.yashwant.ui.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState // ADD THIS
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll // ADD THIS
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,9 +26,8 @@ fun EditProfileScreen(
     appViewModel: AppViewModel,
     viewModel: ProfileViewModel = viewModel()
 ) {
-
     val state = viewModel.state.value
-    val darkTheme by appViewModel.isDarkTheme.collectAsState()
+    val scrollState = rememberScrollState()
 
     var name by remember { mutableStateOf(state.name) }
     var phone by remember { mutableStateOf(state.phone) }
@@ -38,22 +39,22 @@ fun EditProfileScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0B1220))
-            .padding(16.dp)
     ) {
-
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                // SCROLLING HERE
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
 
-            // ───────── HEADER ─────────
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 12.dp, bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 IconButton(
                     onClick = { navController.popBackStack() },
                     modifier = Modifier
@@ -72,8 +73,6 @@ fun EditProfileScreen(
                 )
             }
 
-
-            // ───────── FIELDS ─────────
             GlassField("Name", name) { name = it }
             GlassField("Phone", phone) { phone = it }
             GlassField("Email", email) { email = it }
@@ -82,10 +81,8 @@ fun EditProfileScreen(
 
             Spacer(Modifier.height(10.dp))
 
-            // ───────── SAVE BUTTON ─────────
             Button(
                 onClick = {
-
                     viewModel.updateState(
                         state.copy(
                             name = name,
@@ -95,26 +92,25 @@ fun EditProfileScreen(
                             location = location
                         )
                     )
-
                     viewModel.saveProfile()
 
-                    navController.navigate("profile") {
-                        popUpTo("edit_profile") { inclusive = true }
-                    }
+                    // back to profile
+                    navController.popBackStack()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
+                    .height(56.dp)
+                    .padding(bottom = 20.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF4D7CFE)
-                )
+                ),
+                shape = RoundedCornerShape(14.dp)
             ) {
-                Text("Save Profile", fontWeight = FontWeight.Bold)
+                Text("Save Profile", fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }
 }
-
 
 @Composable
 fun GlassField(
@@ -122,15 +118,13 @@ fun GlassField(
     value: String,
     onChange: (String) -> Unit
 ) {
-
     val shape = RoundedCornerShape(14.dp)
 
     Column {
-
         Text(
             text = label,
             color = Color(0xFFB0B8C5),
-            fontSize = MaterialTheme.typography.labelMedium.fontSize
+            fontSize = 14.sp
         )
 
         Spacer(Modifier.height(6.dp))
@@ -149,7 +143,8 @@ fun GlassField(
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White
             ),
-            shape = shape
+            shape = shape,
+            singleLine = true
         )
     }
 }
