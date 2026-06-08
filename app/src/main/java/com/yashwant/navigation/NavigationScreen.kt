@@ -1,5 +1,7 @@
 package com.yashwant.navigation
 
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -9,8 +11,14 @@ import androidx.navigation.*
 import com.yashwant.ui.screen.*
 import com.yashwant.viewmodel.CalculatorViewModel
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ManageSearch
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.ManageSearch
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yashwant.ui.profile.EditProfileScreen
@@ -42,6 +50,13 @@ sealed class Screen(val route: String) {
     object Calculator  : Screen("calculator")
     object EditProfile : Screen("edit_profile")
     object HandCricket : Screen("hand_cricket")
+
+    object OrderHistory : Screen("order_history")
+
+    object OrderDetail : Screen("order_detail/{orderId}") {
+        fun createRoute(orderId: String) = "order_detail/$orderId"
+    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,6 +73,9 @@ fun NavigationScreen(
     val currentRoute = navBackStackEntry?.destination?.route
 
     val foodHomeViewModel: FoodHomeViewModel = viewModel()
+
+    val ActiveColor = Color(0xFFBA5D00) // The Orange from your screenshot
+    val InactiveColor = Color(0xFF616161) // Grey for unselected
 
     val darkTheme by appViewModel.isDarkTheme.collectAsState()
     val scaffoldBg = if (darkTheme) Color(0xFF121212) else Color(0xFFFBFBFB)
@@ -112,39 +130,81 @@ fun NavigationScreen(
             // FULL BOTTOM NAVIGATION
             bottomBar = {
                 if (showBars) {
-                    NavigationBar (
+                    NavigationBar(
+                        // Container color scaffold ke background se match rakhein
                         containerColor = scaffoldBg,
-                    ){
-                        // 1. Home
+                        tonalElevation = 8.dp,
+                        modifier = Modifier
+                            //  FIX: Fixed height ki jagah system padding use karein
+                            .navigationBarsPadding(),
+                        windowInsets = NavigationBarDefaults.windowInsets
+                    ) {
+                        // --- 1. HOME ---
                         NavigationBarItem(
                             selected = currentRoute == Screen.FoodHome.route,
                             onClick = { navController.navigate(Screen.FoodHome.route) { launchSingleTop = true } },
-                            icon = { Icon(Icons.Default.Home, null) },
-                            label = { Text("Home") }
+                            icon = { Icon(if (currentRoute == Screen.FoodHome.route) Icons.Filled.Home else Icons.Outlined.Home, null) },
+                            label = {
+                                Text("Home", fontWeight = if (currentRoute == Screen.FoodHome.route) FontWeight.Bold else FontWeight.Normal)
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = ActiveColor,
+                                selectedTextColor = ActiveColor,
+                                unselectedIconColor = InactiveColor,
+                                unselectedTextColor = InactiveColor,
+                                indicatorColor = Color.Transparent // ✅ REMOVES THE PILL BACKGROUND
+                            )
                         )
 
-                        // 2. Search
+                        // --- 2. CATEGORIES (Search) ---
                         NavigationBarItem(
                             selected = currentRoute == Screen.Search.route,
                             onClick = { navController.navigate(Screen.Search.route) { launchSingleTop = true } },
-                            icon = { Icon(Icons.Default.Search, null) },
-                            label = { Text("Search") }
+                            icon = { Icon(Icons.Outlined.ManageSearch, null) },
+                            label = {
+                                Text("Categories", fontWeight = if (currentRoute == Screen.Search.route) FontWeight.Bold else FontWeight.Normal)
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = ActiveColor,
+                                selectedTextColor = ActiveColor,
+                                unselectedIconColor = InactiveColor,
+                                unselectedTextColor = InactiveColor,
+                                indicatorColor = Color.Transparent
+                            )
                         )
 
-                        // 3. Cart
+                        // --- 3. CART ---
                         NavigationBarItem(
                             selected = currentRoute == Screen.Cart.route,
                             onClick = { navController.navigate(Screen.Cart.route) { launchSingleTop = true } },
-                            icon = { Icon(Icons.Default.ShoppingCart, null) },
-                            label = { Text("Cart") }
+                            icon = { Icon(Icons.Outlined.ShoppingCart, null) },
+                            label = {
+                                Text("Cart", fontWeight = if (currentRoute == Screen.Cart.route) FontWeight.Bold else FontWeight.Normal)
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = ActiveColor,
+                                selectedTextColor = ActiveColor,
+                                unselectedIconColor = InactiveColor,
+                                unselectedTextColor = InactiveColor,
+                                indicatorColor = Color.Transparent
+                            )
                         )
 
-                        // 4. Profile
+                        // --- 4. ACCOUNT (Profile) ---
                         NavigationBarItem(
                             selected = currentRoute == Screen.Profile.route,
                             onClick = { navController.navigate(Screen.Profile.route) { launchSingleTop = true } },
-                            icon = { Icon(Icons.Default.Person, null) },
-                            label = { Text("Profile") }
+                            icon = { Icon(Icons.Outlined.Person, null) },
+                            label = {
+                                Text("Account", fontWeight = if (currentRoute == Screen.Profile.route) FontWeight.Bold else FontWeight.Normal)
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = ActiveColor,
+                                selectedTextColor = ActiveColor,
+                                unselectedIconColor = InactiveColor,
+                                unselectedTextColor = InactiveColor,
+                                indicatorColor = Color.Transparent
+                            )
                         )
                     }
                 }
@@ -184,10 +244,15 @@ fun NavigationScreen(
                     )
                 }
 
+                composable(Screen.OrderHistory.route) {
+                    OrderHistoryScreen(navController, appViewModel)
+                }
+
                 // --- PORTFOLIO & TOOLS ---
                 composable(Screen.Home.route) { HomeScreen(appViewModel) }
                 composable(Screen.Profile.route) {
-                    ProfileScreen(navController, viewModel(), appViewModel)
+                    // Sequence: NavController, AppViewModel, ProfileViewModel
+                    ProfileScreen(navController, appViewModel, viewModel())
                 }
                 composable(Screen.Calculator.route) {
                     CalculatorScreen(calculatorViewModel, navController, appViewModel)
@@ -204,6 +269,21 @@ fun NavigationScreen(
 
                 composable(Screen.Search.route) {
                     SearchScreen(navController = navController, appViewModel = appViewModel)
+                }
+
+                composable("order_success") {
+                    OrderSuccessScreen(
+                        navController = navController,
+                        appViewModel = appViewModel
+                    )
+                }
+
+                composable(
+                    route = Screen.OrderDetail.route,
+                    arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+                    OrderDetailScreen(navController, orderId, appViewModel)
                 }
             }
         }

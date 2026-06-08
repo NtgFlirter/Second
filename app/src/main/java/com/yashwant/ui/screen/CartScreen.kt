@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -18,16 +19,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.yashwant.R
+import com.yashwant.data.SettingsManager
+import com.yashwant.data.UserRepository
 import com.yashwant.model.CartItem
+import com.yashwant.model.OrderItem
+import com.yashwant.navigation.Screen
 import com.yashwant.viewmodel.AppViewModel
 import com.yashwant.viewmodel.CartViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun CartScreen(
@@ -44,6 +53,10 @@ fun CartScreen(
     val textColor = if (isDarkTheme) Color.White else Color.Black
     val cardColor = if (isDarkTheme) Color(0xFF1E1E1E) else Color.White
     val brandGreen = Color(0xFF65B741)
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val repository = UserRepository(SettingsManager(context), context)
 
     // 3. Billing Logic
     val totalBill = cartItems.sumOf { it.price * it.quantity }
@@ -120,7 +133,30 @@ fun CartScreen(
 
                     // Right Side: Button
                     Button(
-                        onClick = { /* Implement Checkout */ },
+                        onClick = {
+                            if (cartItems.isNotEmpty()) {
+                                val currentTime = System.currentTimeMillis()
+                                // Randomly choose between 20 and 45 minutes
+                                val randomDeliveryMinutes = (20..45).random()
+                                val deliveryTimeInMillis = currentTime + (randomDeliveryMinutes * 60 * 1000)
+
+                                val newOrder = OrderItem(
+                                    orderId = "ORD${currentTime}",
+                                    userId = cartViewModel.uid ?: "",
+                                    items = cartItems,
+                                    totalAmount = totalBill,
+                                    orderTime = currentTime,
+                                    expectedDeliveryTime = deliveryTimeInMillis, // This is the fix!
+                                    status = "Confirmed"
+                                )
+
+                                cartViewModel.placeOrder(newOrder) { success ->
+                                    if (success) {
+                                        navController.navigate("order_success")
+                                    }
+                                }
+                            }
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                         shape = RoundedCornerShape(12.dp),
                         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
@@ -132,6 +168,7 @@ fun CartScreen(
         }
     }
 }
+
 
 @Composable
 fun CartItemRow(
@@ -152,13 +189,15 @@ fun CartItemRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Food Image
-            Image(
-                painter = painterResource(id = item.image),
+            AsyncImage(
+                model = item.image, // Coil automatically handles URL (String) or Drawable (Int)
                 contentDescription = null,
                 modifier = Modifier
                     .size(75.dp)
                     .clip(RoundedCornerShape(15.dp)),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.food_start),
+                error = painterResource(id = R.drawable.food_start)
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -205,7 +244,7 @@ fun CartItemRow(
                     }
                 }
 
-                // Delete Button (Optional Extra)
+                // Delete Button
                 IconButton(onClick = { viewModel.removeItem(item.name) }) {
                     Icon(Icons.Default.DeleteOutline, null, tint = Color.Red.copy(0.6f))
                 }

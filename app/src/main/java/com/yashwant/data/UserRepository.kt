@@ -5,6 +5,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.yashwant.model.CartItem
 import com.yashwant.model.HistoryItem
+import com.yashwant.model.OrderItem
 import com.yashwant.model.ProfileState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
@@ -90,12 +91,47 @@ class UserRepository(
         auth.signOut()
     }
 
+    // UserRepository.kt ke andar ye function paste karein:
+
+    suspend fun placeOrder(order: OrderItem): Result<Boolean> {
+        // 1. Check user login
+        val id = uid ?: return Result.failure(Exception("User not logged in"))
+
+        return try {
+            // 2. Order ko 'orders' collection mein save kiya (Global access ke liye)
+            db.collection("orders").document(order.orderId).set(order).await()
+
+            // 3. ✨ JADU: Cart ko khali karna (Order successful hone ke baad)
+            // User ke personal cart folder mein jitne bhi items hain, unhe delete karo
+            val cartItems = db.collection("users").document(id).collection("cart").get().await()
+            for (document in cartItems.documents) {
+                document.reference.delete().await()
+            }
+
+            Result.success(true)
+        } catch (e: Exception) {
+            // Agar internet chala jaye ya koi error aaye
+            Result.failure(e)
+        }
+    }
+
 
     suspend fun saveProfile(profile: ProfileState) {
         uid?.let { id ->
             db.collection("users").document(id)
                 .set(mapOf("profile" to profile), SetOptions.merge())
         }
+    }
+
+    fun getOrdersStream(): Flow<List<OrderItem>> = callbackFlow {
+        val id = uid ?: return@callbackFlow
+        val listener = db.collection("orders")
+            .whereEqualTo("userId", id) // Sirf usi user ke orders dikhao
+            .addSnapshotListener { snap, _ ->
+                val list = snap?.toObjects(OrderItem::class.java) ?: emptyList()
+                trySend(list)
+            }
+        awaitClose { listener.remove() }
     }
 
     suspend fun loadProfile(): ProfileState {

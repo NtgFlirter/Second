@@ -152,8 +152,9 @@ fun FoodDetailScreen(
                             repository.addToCart(
                                 CartItem(
                                     name = foodItem.name,
-                                    price = foodItem.price, // Asli price
-                                    image = foodItem.image as? Int ?: R.drawable.food_start, // Logic handle
+                                    price = foodItem.price,
+                                    // Pass the image directly (Any?)
+                                    image = foodItem.image,
                                     quantity = quantity,
                                     restaurantName = foodItem.restaurantName
                                 )
