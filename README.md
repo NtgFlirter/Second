@@ -72,3 +72,7 @@ com.yashwant
 
 
 ## ⚙️ Installation & Setup
+- Clone the repository.
+- Add your google-services.json in the app/ directory.
+- Open in Android Studio Otter (2025.2.x) or latest.
+- Sync Gradle and run on an emulator/device with API 35.
