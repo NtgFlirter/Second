@@ -1,113 +1,71 @@
-Yeh raha aapke "Waves of Food" app ke liye ek professional aur detailed
-README.md file ka content. Aap ise copy karke apne project ke root folder mein
-README.md naam se save kar sakte hain.
+# 🌊 Waves of Food - Modern Food Delivery & Utility App
 
-🌊 Waves of Food - Modern Food Delivery & Utility App
+**Waves of Food** ek high-performance Android application hai jo modern development practices aur clean architecture ko follow karta hai. Yeh app na sirf ek premium food delivery experience deta hai balki isme daily utility tools jaise Calculator aur Game bhi integrated hain.
 
-Waves of Food ek high-performance Android application hai jo modern development
-practices aur clean architecture ko follow karta hai. Yeh app na sirf ek premium
-food delivery experience deta hai balki isme daily utility tools jaise
-Calculator aur Game bhi integrated hain.
+---
 
-🚀 Features
+## 🏗 1. MVVM Architecture
 
-🍱 Food Delivery (Main Module)
+App ko **Clean Architecture** ke principles par design kiya gaya hai taaki code maintainable aur scalable rahe.
 
-  - Live Menu: Retrofit aur API integration ke zariye real-time food data load
-    hota hai.
-  - Smart Search: Dish name, cuisine, ya restaurant ke basis par fast filtering.
-  - Advanced UI: Zomato/Swiggy style nested horizontal aur vertical scrolling
-    layouts.
-  - Real-time Cart: Firebase Firestore ke through managed live cart system (No
-    Refresh required).
-  - Checkout Flow: Seamless order placement logic with custom success
-    animations.
+### **The Data Flow:**
+`View (UI)` ➔ `ViewModel (State)` ➔ `Repository (Data Manager)` ➔ `Model (Data Structure)`
 
-🛠 Utility & Games
+*   **View (Compose):** Sirf UI dikhane aur user events capture karne ka kaam karta hai.
+*   **ViewModel:** UI State ko hold karta hai aur Business Logic process karta hai.
+*   **Repository (The Data Manager):** Yeh app ka sabse "Smart" hissa hai. Yeh decide karta hai ki data kahan se aayega:
+    *   **Remote Source:** Firebase Firestore (for Cart/Orders) ya Retrofit API (for Menu).
+    *   **Local Source:** Jetpack DataStore (for Theme) ya In-memory Cache.
+*   **Model:** Data structures ko define karne wali Data Classes.
 
-  - Pro Calculator: History support ke saath advanced mathematical operations.
-  - Hand Cricket: Memory-efficient logic par based ek fun mini-game.
-  - Profile Management: Glassmorphism UI ke saath user profile editing aur cloud
-    sync.
+---
 
-🎨 App Experience
+## 🔥 2. Firebase & Backend Integration
 
-  - Modern UI: 100% Jetpack Compose aur Material 3 ka upyog.
-  - Global Theming: Dark aur Light mode support, jo Jetpack DataStore se
-    persisted hai.
-  - Smooth Navigation: Splash Screen -> Onboarding -> Login -> Home ka
-    professional flow.
+App **Firebase Firestore** se fully linked hai real-time data handling ke liye.
 
-🏗 Architecture (MVVM + Repository)
+*   **Configuration:** `google-services.json` file ke zariye linked hai.
+*   **Security:** SHA-1 API Fingerprint ka use kiya gaya hai taaki cloud services authorised rahein.
+*   **Live Sync:** Firestore `addSnapshotListener` ka use karke Cart aur Profile updates bina refresh kiye UI par dikhte hain.
 
-App ko Clean Architecture ke principles par design kiya gaya hai taaki code
-maintainable aur scalable rahe.
+---
 
-The Flow:
+## 🚀 Key Features
 
-View (UI) ➔ ViewModel (State) ➔ Repository (Data Manager) ➔ Model (Data
-Structure)
+### 🍱 Food Delivery Engine
+- **Retrofit API:** `dummyjson.com` se live recipes fetch ki jati hain.
+- **Data Mapping:** Raw API data ko local model mein transform karke Custom Prices aur Restaurant Names add kiye gaye hain.
+- **Smart Search:** Dish name aur cuisine ke basis par fast filtering logic.
+- **Real-time Cart:** Firebase-based cart system jisme quantity control aur auto-billing integrated hai.
 
-1.  View (Compose): Sirf UI dikhane aur user events capture karne ka kaam karta
-    hai.
-2.  ViewModel: UI State ko hold karta hai aur Business Logic process karta hai.
-3.  Repository (The Data Manager): Yeh app ka sabse "Smart" hissa hai. Yeh
-    decide karta hai ki data kahan se aayega:
-      - Remote Source: Firebase Firestore ya Retrofit API.
-      - Local Source: Jetpack DataStore ya In-memory Cache.
-4.  Model: Data structures ko define karne wali Data Classes.
+### 🛠 Utility & Experience
+- **Pro Calculator:** Mathematical engine ke saath history tracking support.
+- **Hand Cricket:** Memory-efficient logic par based ek fun mini-game.
+- **Global Theming:** Dark/Light mode switching jo **Jetpack DataStore** se persistent hai.
+- **Modern UI:** Glassmorphism effect, nested horizontal scrolling (Swiggy style), aur smooth animations.
 
-🛠 Tech Stack
+---
 
-  - Kotlin: Primary programming language.
-  - Jetpack Compose: Modern toolkit for building native UI.
-  - Retrofit & GSON: REST API communication aur JSON parsing ke liye.
-  - Firebase Firestore: Cloud-based NoSQL database real-time sync ke liye.
-  - Firebase Auth: User identity aur security management.
-  - Coil: Kotlin-first image loading library (AsyncImage).
-  - Coroutines & Flow: Asynchronous programming aur real-time data streaming ke
-    liye.
-  - Jetpack DataStore: Local preference storage (Theme & Settings).
+## 🛠 Tech Stack
 
-🔑 Firebase Integration
+| Category | Technology Used |
+| :--- | :--- |
+| **Language** | Kotlin |
+| **UI Framework** | Jetpack Compose (Material 3) |
+| **Networking** | Retrofit, GSON |
+| **Database** | Firebase Firestore |
+| **Local Storage** | Jetpack DataStore |
+| **Image Loading** | Coil (AsyncImage) |
+| **Threading** | Kotlin Coroutines & Flow |
 
-App ko successfully chalane ke liye Firebase configuration zaroori hai:
+---
 
-1.  google-services.json: Is file ko app/ directory mein rakha gaya hai. Isme
-    Project ID aur API Keys maujood hain.
-2.  SHA-1 Fingerprint: App ko Firebase Console mein SHA-1 debug key se link kiya
-    gaya hai taaki Firebase Auth aur Google Services authorised rahein.
-3.  Firestore Rules: Cloud data security ke liye custom rules implement kiye
-    gaye hain.
+## 📂 Project Structure
 
-📂 Project Structure
-
+```text
 com.yashwant
-├── calculator      # Calculator engine logic
 ├── data            # Repositories, API Services, DataStore managers
 ├── model           # FoodItem, CartItem, OrderItem, ProfileState
 ├── navigation      # Screen routes aur NavHost setup
-├── ui              # UI Layer
-│   ├── components  # Reusable UI elements (Cards, Buttons)
-│   ├── profile     # Profile specific screens
-│   ├── screen      # Main app screens (Home, Search, Cart, etc.)
-│   └── theme       # Colors, Typography, aur Theme wrapper
-└── viewmodel       # State management for all screens
-
-🛠 Installation
-
-1.  Clone this repository.
-2.  Apna google-services.json file app/ folder mein daalein.
-3.  Android Studio (Version Otter 2025.2.x ya latest) mein project open karein.
-4.  Gradle Sync karein aur compileSdk 35 par run karein.
-
-✨ Highlights of our Learning Journey:
-
-  - Stable Data Mapping: Item name ke basis par price aur restaurants ko sync
-    rakhne ki logic.
-  - Shared ViewModels: Multiple screens ke beech data consistence rakhne ka
-    professional tarika.
-  - Edge-to-Edge: Status bar aur navigation bar ko app theme ke saath fully sync
-    kiya gaya hai.
-
-Developed with ❤️ by Yashwant Vashisth
+├── ui              # UI Layer (Components, Screens, Theme)
+└── viewmodel       # State management logic
