@@ -83,9 +83,4 @@ com.yashwant
 
 ---
 
-### Isse kaise use karein?
-1. Apne Android Studio mein **`README.md`** file kholiye (agar nahi hai toh root folder par right-click karke New -> File banaiye).
-2. Purana sab delete karke ye upar wala code paste kar dijiye.
-3. Upar "Preview" tab par click karke dekhiye, ye ek dam professional dikhega!
-
 **DEVELOPED BY YASHWANT VASHISTH GITHUB.COM/YASHWANT2005**
