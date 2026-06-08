@@ -70,6 +70,7 @@ com.yashwant
 ├── ui              # UI Layer (Components, Screens, Theme)
 └── viewmodel       # State management logic
 
+---
 
 ## ⚙️ Installation & Setup
 - Clone the repository.
