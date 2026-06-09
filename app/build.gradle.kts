@@ -2,6 +2,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.android.application")
     id("com.google.gms.google-services")
+
+    alias(libs.plugins.google.devtools.ksp)
 }
 
 android {
@@ -31,6 +33,10 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
     }
 
     buildFeatures {
@@ -86,4 +92,10 @@ dependencies {
 
 // 8. Coil: Internet se image dikhane ke liye (AsyncImage)
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    // Use ksp instead of kapt
+    ksp(libs.androidx.room.compiler)
 }
