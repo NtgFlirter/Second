@@ -1,11 +1,13 @@
 package com.yashwant.model
 
-import androidx.annotation.DrawableRes
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
+@Entity(tableName = "cart_items")
 data class CartItem(
-    val name: String = "",
+    @PrimaryKey val name: String = "",
     val price: Double = 0.0,
-    val image: Any? = null, // ✅ Changed to Any?
+    val image: String? = null,
     var quantity: Int = 1,
     val restaurantName: String = "Waves Kitchen"
 )

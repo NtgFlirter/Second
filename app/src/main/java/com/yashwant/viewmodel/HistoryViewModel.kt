@@ -14,11 +14,11 @@ import kotlinx.coroutines.launch
 class HistoryViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = UserRepository(SettingsManager(application), application)
 
-
     private val _orderList = MutableStateFlow<List<OrderItem>>(emptyList())
-
-    // Explicitly batayein ki ye StateFlow<List<OrderItem>> hai
     val orderList: StateFlow<List<OrderItem>> = _orderList.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init {
         fetchOrderHistory()
@@ -26,9 +26,10 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
 
     private fun fetchOrderHistory() {
         viewModelScope.launch {
-            // Hum UserRepository mein 'getOrdersStream' function banayenge
+            _isLoading.value = true
             repository.getOrdersStream().collect { orders ->
                 _orderList.value = orders
+                _isLoading.value = false
             }
         }
     }

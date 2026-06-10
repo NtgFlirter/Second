@@ -39,6 +39,15 @@ android {
         arg("room.schemaLocation", "$projectDir/schemas")
     }
 
+    sourceSets {
+        getByName("debug") {
+            kotlin.srcDir("build/generated/ksp/debug/kotlin")
+        }
+        getByName("release") {
+            kotlin.srcDir("build/generated/ksp/release/kotlin")
+        }
+    }
+
     buildFeatures {
         compose = true
     }

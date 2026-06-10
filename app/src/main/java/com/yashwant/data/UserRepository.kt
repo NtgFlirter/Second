@@ -1,7 +1,11 @@
 package com.yashwant.data
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 import com.yashwant.model.CartItem
 import com.yashwant.model.HistoryItem
@@ -14,33 +18,36 @@ import kotlinx.coroutines.flow.callbackFlow
 
 class UserRepository(
     val settingsManager: SettingsManager,
-    private val context: android.content.Context? = null
+    private val context: Context? = null
 )  {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
-    // Current Logged-in User ki ID nikalne ke liye
     val uid: String? get() = auth.currentUser?.uid
 
-    // UI hamesha isko observe karega
     val themeStream: Flow<Boolean> = settingsManager.themeFlow
 
-    suspend fun toggleTheme(isDark: Boolean) {
-        // Step A: Local Store mein save karo
-        settingsManager.saveTheme(isDark)
+    // Robust check for actual internet connectivity
+    fun isNetworkAvailable(): Boolean {
+        val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+        val network = connectivityManager?.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        // NET_CAPABILITY_VALIDATED ensures the internet is actually working, not just "connected"
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+               capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+    }
 
-        // Step B: Firebase par update kardo
+    suspend fun toggleTheme(isDark: Boolean) {
+        settingsManager.saveTheme(isDark)
         uid?.let { id ->
             db.collection("users").document(id)
                 .set(mapOf("isDarkTheme" to isDark), SetOptions.merge())
         }
     }
 
-
     suspend fun signUp(email: String, pass: String): Result<Boolean> {
         return try {
             auth.createUserWithEmailAndPassword(email, pass).await()
-            // Naya user bante hi uska default document Firestore mein bana do
             uid?.let { id ->
                 db.collection("users").document(id).set(
                     mapOf("createdAt" to System.currentTimeMillis()),
@@ -55,12 +62,9 @@ class UserRepository(
 
     fun getProfileStream(): Flow<ProfileState> = callbackFlow {
         val id = uid ?: return@callbackFlow
-
-        // addSnapshotListener keeps a live connection to the document
         val listener = db.collection("users").document(id)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) return@addSnapshotListener
-
                 val data = snapshot?.get("profile") as? Map<String, Any>
                 if (data != null) {
                     val profile = ProfileState(
@@ -70,11 +74,9 @@ class UserRepository(
                         role = data["role"] as? String ?: "",
                         location = data["location"] as? String ?: ""
                     )
-                    trySend(profile) // This sends the data to the ViewModel instantly
+                    trySend(profile)
                 }
             }
-
-        // Removed listener when not needed to save battery/data
         awaitClose { listener.remove() }
     }
 
@@ -91,30 +93,35 @@ class UserRepository(
         auth.signOut()
     }
 
-    // UserRepository.kt ke andar ye function paste karein:
-
+    /**
+     * Places an order. Uses runTransaction to ensure it only succeeds if online.
+     * Prevents multiple "ghost" orders being queued in local cache while offline.
+     */
     suspend fun placeOrder(order: OrderItem): Result<Boolean> {
-        // 1. Check user login
         val id = uid ?: return Result.failure(Exception("User not logged in"))
+        
+        // 1. Double check connectivity before starting
+        if (!isNetworkAvailable()) {
+            return Result.failure(Exception("PLEASE CHECK YOUR INTERNET CONNECTION"))
+        }
 
         return try {
-            // 2. Order ko 'orders' collection mein save kiya (Global access ke liye)
-            db.collection("orders").document(order.orderId).set(order).await()
-
-            // 3. ✨ JADU: Cart ko khali karna (Order successful hone ke baad)
-            // User ke personal cart folder mein jitne bhi items hain, unhe delete karo
+            // 2. runTransaction forces a server check. It cannot complete offline.
+            db.runTransaction { transaction ->
+                val orderRef = db.collection("orders").document(order.orderId)
+                transaction.set(orderRef, order)
+            }.await()
+            
+            // 3. Clear cart from Firestore only after successful transaction
             val cartItems = db.collection("users").document(id).collection("cart").get().await()
             for (document in cartItems.documents) {
                 document.reference.delete().await()
             }
-
             Result.success(true)
         } catch (e: Exception) {
-            // Agar internet chala jaye ya koi error aaye
             Result.failure(e)
         }
     }
-
 
     suspend fun saveProfile(profile: ProfileState) {
         uid?.let { id ->
@@ -124,14 +131,39 @@ class UserRepository(
     }
 
     fun getOrdersStream(): Flow<List<OrderItem>> = callbackFlow {
-        val id = uid ?: return@callbackFlow
-        val listener = db.collection("orders")
-            .whereEqualTo("userId", id) // Sirf usi user ke orders dikhao
-            .addSnapshotListener { snap, _ ->
-                val list = snap?.toObjects(OrderItem::class.java) ?: emptyList()
-                trySend(list)
+        var firestoreListener: ListenerRegistration? = null
+        trySend(emptyList())
+
+        fun startListening(userId: String) {
+            firestoreListener?.remove()
+            firestoreListener = db.collection("orders")
+                .whereEqualTo("userId", userId)
+                .addSnapshotListener { snap, error ->
+                    if (error != null) {
+                        trySend(emptyList())
+                        return@addSnapshotListener
+                    }
+                    val list = snap?.toObjects(OrderItem::class.java) ?: emptyList()
+                    trySend(list)
+                }
+        }
+
+        val initialUid = auth.currentUser?.uid
+        if (initialUid != null) startListening(initialUid)
+
+        val authListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            val userId = firebaseAuth.currentUser?.uid
+            if (userId != null) startListening(userId) else {
+                firestoreListener?.remove()
+                trySend(emptyList())
             }
-        awaitClose { listener.remove() }
+        }
+
+        auth.addAuthStateListener(authListener)
+        awaitClose { 
+            auth.removeAuthStateListener(authListener)
+            firestoreListener?.remove()
+        }
     }
 
     suspend fun loadProfile(): ProfileState {
@@ -139,7 +171,6 @@ class UserRepository(
         return try {
             val snapshot = db.collection("users").document(id).get().await()
             val data = snapshot.get("profile") as? Map<String, Any> ?: return ProfileState()
-
             ProfileState(
                 name = data["name"] as? String ?: "",
                 email = data["email"] as? String ?: "",
@@ -159,28 +190,24 @@ class UserRepository(
         }
     }
 
-    // 1. Cart mein item daalne ke liye
     suspend fun addToCart(item: CartItem) {
         uid?.let { id ->
-            // Hum food name ko hi document ID bana rahe hain taaki duplicate na ho
             db.collection("users").document(id)
                 .collection("cart").document(item.name)
                 .set(item)
         }
     }
 
-    // 2. Cart ke items Live dekhne ke liye (Stream)
     fun getCartStream(): Flow<List<CartItem>> = callbackFlow {
         val id = uid ?: return@callbackFlow
         val listener = db.collection("users").document(id).collection("cart")
             .addSnapshotListener { snapshot, _ ->
                 val items = snapshot?.toObjects(CartItem::class.java) ?: emptyList()
-                trySend(items) // ViewModel ko data bhej do
+                trySend(items)
             }
-        awaitClose { listener.remove() } // Memory saaf karo
+        awaitClose { listener.remove() }
     }
 
-    // 3. Item delete karne ke liye
     suspend fun deleteFromCart(itemName: String) {
         uid?.let { id ->
             db.collection("users").document(id)
@@ -193,7 +220,6 @@ class UserRepository(
         return try {
             val snapshot = db.collection("users").document(id).get().await()
             val list = snapshot.get("history") as? List<Map<String, Any>> ?: return emptyList()
-
             list.map {
                 HistoryItem(
                     expression = it["expression"] as? String ?: "",

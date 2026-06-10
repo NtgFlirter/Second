@@ -13,10 +13,8 @@ benchmarkTraceprocessor = "1.4.1"
 remoteCreationCore = "1.0.0-alpha11"
 firebaseAuthKtx = "24.1.0"
 foundation = "1.11.2"
-room = "2.6.1"
+room = "2.7.0-alpha11"
 ksp = "2.0.21-1.0.26"
-
-
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,8 +41,6 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 # Datastore missing ho sakta hai catalog mein toh ye bhi add karlein
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version = "1.1.1" }
-
-
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
