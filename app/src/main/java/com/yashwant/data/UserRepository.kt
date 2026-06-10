@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
+import com.yashwant.model.AddressState
 import com.yashwant.model.CartItem
 import com.yashwant.model.HistoryItem
 import com.yashwant.model.OrderItem
@@ -91,6 +92,32 @@ class UserRepository(
 
     fun logout() {
         auth.signOut()
+    }
+
+
+    // 1. Save Address
+    suspend fun saveAddress(address: AddressState) {
+        uid?.let { id ->
+            db.collection("users").document(id)
+                .set(mapOf("address" to address), SetOptions.merge()).await()
+        }
+    }
+
+    // 2. Load Address (One-time fetch)
+    suspend fun loadAddress(): AddressState {
+        val id = uid ?: return AddressState()
+        return try {
+            val snapshot = db.collection("users").document(id).get().await()
+            val data = snapshot.get("address") as? Map<String, Any> ?: return AddressState()
+            AddressState(
+                zipCode = data["zipCode"] as? String ?: "",
+                country = data["country"] as? String ?: "",
+                state = data["state"] as? String ?: "",
+                city = data["city"] as? String ?: "",
+                street = data["street"] as? String ?: "",
+                addressType = data["addressType"] as? String ?: "Home"
+            )
+        } catch (e: Exception) { AddressState() }
     }
 
     /**

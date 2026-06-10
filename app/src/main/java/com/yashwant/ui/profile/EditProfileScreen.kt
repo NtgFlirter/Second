@@ -2,10 +2,10 @@ package com.yashwant.ui.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState // ADD THIS
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll // ADD THIS
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,29 +26,46 @@ fun EditProfileScreen(
     appViewModel: AppViewModel,
     viewModel: ProfileViewModel = viewModel()
 ) {
-    val state = viewModel.state.value
+    // 1. Firebase se data aur Theme observe karein
+    val profileState by viewModel.state
+    val isDark by appViewModel.isDarkTheme.collectAsState()
     val scrollState = rememberScrollState()
 
-    var name by remember { mutableStateOf(state.name) }
-    var phone by remember { mutableStateOf(state.phone) }
-    var email by remember { mutableStateOf(state.email) }
-    var role by remember { mutableStateOf(state.role) }
-    var location by remember { mutableStateOf(state.location) }
+    // 2. Local input variables (Inhe hum LaunchedEffect se update karenge)
+    var name by remember { mutableStateOf(profileState.name) }
+    var phone by remember { mutableStateOf(profileState.phone) }
+    var email by remember { mutableStateOf(profileState.email) }
+    var role by remember { mutableStateOf(profileState.role) }
+    var location by remember { mutableStateOf(profileState.location) }
+
+    // 3. ✨ MAGIC FIX: Jab data internet se load ho kar aaye, tab in boxes ko bhar do
+    LaunchedEffect(profileState) {
+        name = profileState.name
+        phone = profileState.phone
+        email = profileState.email
+        role = profileState.role
+        location = profileState.location
+    }
+
+    // 4. Dynamic Theme Colors
+    val backgroundColor = if (isDark) Color(0xFF0B1220) else Color(0xFFF5F7FF)
+    val headColor = if (isDark) Color.White else Color.Black
+    val fieldLabelColor = if (isDark) Color(0xFFB0B8C5) else Color.Gray
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0B1220))
+            .background(backgroundColor)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                // SCROLLING HERE
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
 
+            // ───────── HEADER ─────────
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -58,9 +75,13 @@ fun EditProfileScreen(
                 IconButton(
                     onClick = { navController.popBackStack() },
                     modifier = Modifier
-                        .background(Color.Black.copy(0.3f), CircleShape)
+                        .background(
+                            if (isDark) Color.White.copy(0.1f) else Color.Black.copy(0.05f),
+                            CircleShape
+                        )
                 ) {
-                    Text("←", color = Color.White, fontSize = 30.sp)
+                    // Modern back arrow
+                    Text("←", color = headColor, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 }
 
                 Spacer(Modifier.width(20.dp))
@@ -68,23 +89,26 @@ fun EditProfileScreen(
                 Text(
                     text = "Edit Profile",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = Color.White,
+                    color = headColor,
                     fontWeight = FontWeight.Bold
                 )
             }
 
-            GlassField("Name", name) { name = it }
-            GlassField("Phone", phone) { phone = it }
-            GlassField("Email", email) { email = it }
-            GlassField("Role", role) { role = it }
-            GlassField("Location", location) { location = it }
+            // ───────── INPUT FIELDS ─────────
+            GlassField("Name", name, isDark) { name = it }
+            GlassField("Phone", phone, isDark) { phone = it }
+            GlassField("Email", email, isDark) { email = it }
+            GlassField("Role", role, isDark) { role = it }
+            GlassField("Location", location, isDark) { location = it }
 
             Spacer(Modifier.height(10.dp))
 
+            // ───────── SAVE BUTTON ─────────
             Button(
                 onClick = {
+                    // Pehle state update karo, phir Firebase mein save karo
                     viewModel.updateState(
-                        state.copy(
+                        profileState.copy(
                             name = name,
                             phone = phone,
                             email = email,
@@ -94,15 +118,15 @@ fun EditProfileScreen(
                     )
                     viewModel.saveProfile()
 
-                    // back to profile
+                    // Back to profile screen
                     navController.popBackStack()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
-                    .padding(bottom = 20.dp),
+                    .padding(bottom = 10.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4D7CFE)
+                    containerColor = Color(0xFF4D7CFE) // Professional Blue
                 ),
                 shape = RoundedCornerShape(14.dp)
             ) {
@@ -116,14 +140,17 @@ fun EditProfileScreen(
 fun GlassField(
     label: String,
     value: String,
+    isDark: Boolean,
     onChange: (String) -> Unit
 ) {
     val shape = RoundedCornerShape(14.dp)
+    val textColor = if (isDark) Color.White else Color.Black
+    val fieldBg = if (isDark) Color.White.copy(alpha = 0.06f) else Color.Black.copy(alpha = 0.04f)
 
     Column {
         Text(
             text = label,
-            color = Color(0xFFB0B8C5),
+            color = if (isDark) Color(0xFFB0B8C5) else Color.Gray,
             fontSize = 14.sp
         )
 
@@ -135,13 +162,13 @@ fun GlassField(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape)
-                .background(Color.White.copy(alpha = 0.06f)),
+                .background(fieldBg),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color(0xFF4D7CFE),
                 unfocusedBorderColor = Color.Transparent,
                 cursorColor = Color(0xFF4D7CFE),
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White
+                focusedTextColor = textColor,
+                unfocusedTextColor = textColor
             ),
             shape = shape,
             singleLine = true

@@ -132,7 +132,13 @@ fun FoodHomeScreen(
                                 Text("Special Deal \nfor You", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Button(
-                                    onClick = {},
+                                    onClick = {
+                                        // Redirect to Cart Screen
+                                        navController.navigate(Screen.Cart.route) {
+                                            // launchSingleTop ensures we don't open multiple copies of the same screen
+                                            launchSingleTop = true
+                                        }
+                                    },
                                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                                     shape = RoundedCornerShape(10.dp)
                                 ) {

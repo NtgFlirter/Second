@@ -21,11 +21,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.yashwant.ui.profile.EditAddressScreen
 import com.yashwant.ui.profile.EditProfileScreen
 import kotlinx.coroutines.launch
 import com.yashwant.ui.profile.ProfileScreen
 import com.yashwant.viewmodel.AppViewModel
 import com.yashwant.viewmodel.FoodHomeViewModel
+import com.yashwant.viewmodel.ProfileViewModel
 
 sealed class Screen(val route: String) {
     object Splash      : Screen("splash")
@@ -39,6 +41,8 @@ sealed class Screen(val route: String) {
     object FoodDetail : Screen("food_detail/{foodName}") {
         fun createRoute(foodName: String) = "food_detail/$foodName"
     }
+
+    object EditAddress : Screen("edit_address")
     object Home        : Screen("home")
     object Calculator  : Screen("calculator")
     object EditProfile : Screen("edit_profile")
@@ -64,9 +68,11 @@ fun NavigationScreen(
 
     // Create SHARED ViewModel here
     val foodHomeViewModel: FoodHomeViewModel = viewModel()
+    val profileViewModel: ProfileViewModel = viewModel()
 
     val ActiveColor = Color(0xFFBA5D00)
     val InactiveColor = Color(0xFF616161)
+
 
     val darkTheme by appViewModel.isDarkTheme.collectAsState()
     val scaffoldBg = if (darkTheme) Color(0xFF121212) else Color(0xFFFBFBFB)
@@ -209,6 +215,14 @@ fun NavigationScreen(
                         foodName = name,
                         appViewModel = appViewModel, // FIXED: Pass appViewModel
                         foodViewModel = foodHomeViewModel
+                    )
+                }
+
+                composable(Screen.EditAddress.route) {
+                    EditAddressScreen(
+                        navController = navController,
+                        appViewModel = appViewModel,
+                        viewModel = profileViewModel
                     )
                 }
 

@@ -46,6 +46,8 @@ fun ProfileScreen(
     val textColor = if (isDarkTheme) Color.White else Color.Black
     val brandGreen = Color(0xFF65B741)
 
+    var showPaymentDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -86,8 +88,10 @@ fun ProfileScreen(
         ProfileMenuItem("My Orders", Icons.Default.History, textColor) {
             navController.navigate(Screen.OrderHistory.route)
         }
-        ProfileMenuItem("My Addresses", Icons.Default.LocationOn, textColor) { }
-        ProfileMenuItem("Payment Methods", Icons.Default.Payment, textColor) { }
+        ProfileMenuItem("My Addresses", Icons.Default.LocationOn, textColor) {
+            navController.navigate(Screen.EditAddress.route)
+        }
+        ProfileMenuItem("Payment Methods", Icons.Default.Payment, textColor) { showPaymentDialog = true }
 
         // Old Tools as Shortcuts
         ProfileMenuItem("Calculator", Icons.Default.Calculate, textColor) { navController.navigate("calculator") }
@@ -102,6 +106,32 @@ fun ProfileScreen(
         ) {
             Text("Log Out", color = Color.Red, fontWeight = FontWeight.Bold)
         }
+
+        if (showPaymentDialog) {
+            AlertDialog(
+                onDismissRequest = { showPaymentDialog = false }, // Bahar click karne par band ho jaye
+                confirmButton = {
+                    TextButton(onClick = { showPaymentDialog = false }) {
+                        Text("Understood", color = brandGreen, fontWeight = FontWeight.Bold)
+                    }
+                },
+                title = {
+                    Text(text = "Payment Methods", fontWeight = FontWeight.Bold, color = textColor)
+                },
+                text = {
+                    Text(
+                        text = "Currently, Waves of Food only accepts Cash on Delivery (COD). Online payment options will be available soon!",
+                        color = if (isDarkTheme) Color.LightGray else Color.DarkGray
+                    )
+                },
+                containerColor = cardColor, // Theme sync logic
+                shape = RoundedCornerShape(20.dp),
+                icon = {
+                    Icon(Icons.Default.Payments, contentDescription = null, tint = brandGreen, modifier = Modifier.size(32.dp))
+                }
+            )
+        }
+
     }
 }
 
